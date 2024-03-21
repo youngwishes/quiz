@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+
+  app:
+    build: .
+    container_name: app
+    restart: always
+    ports:
+      - "8000:8000"
+    command:
+      - bash
+      - /app/entrypoint.sh
+    volumes:
+      - ./src/:/app/
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15.1-alpine
+    container_name: db
+    restart: always
+    ports:
+      - "5432:5432"
+    env_file:
+     - .env
+
+volumes:
+  postgres_data:
