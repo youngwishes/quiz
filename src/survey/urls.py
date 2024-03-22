@@ -1,12 +1,10 @@
 from rest_framework.routers import DefaultRouter
-from survey.views import SurveyViewSet
-from django.urls import include, path
+from survey.views import (
+    QuizViewSet,
 
+)
 
 router = DefaultRouter()
+router.register(r"", QuizViewSet, basename="quizzes")
 
-router.register("", SurveyViewSet)
-
-urlpatterns = [
-    path("", include(router.urls)),
-]
+urlpatterns = router.urls

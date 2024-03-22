@@ -7,3 +7,4 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filterset_fields = "status",
+    http_method_names = ["get", "post", "put", "delete"]
