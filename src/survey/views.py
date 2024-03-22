@@ -16,6 +16,5 @@ class QuizViewSet(viewsets.ModelViewSet):
     http_method_names = ["get", "post", "put", "delete"]
 
     def list(self, request: Request, *args, **kwargs) -> Response:
-        serializer = QuizListSerializer(self.queryset, many=True)
-        data = serializer.data
-        return Response(data=data, status=status.HTTP_200_OK)
+        serializer = QuizListSerializer(self.get_queryset(), many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
