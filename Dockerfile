@@ -10,6 +10,8 @@ RUN pip install "poetry==1.7.1" && poetry config virtualenvs.create false --loca
 
 COPY pyproject.toml poetry.lock ./
 
+RUN poetry update
+
 RUN poetry install --no-root
 
 COPY src .
