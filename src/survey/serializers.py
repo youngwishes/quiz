@@ -1,6 +1,3 @@
-import json
-import pprint
-
 from django.db.transaction import atomic
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
