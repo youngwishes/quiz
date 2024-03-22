@@ -5,7 +5,7 @@ from django.urls import include, path
 
 router = DefaultRouter()
 
-router.register("survey", SurveyViewSet)
+router.register("", SurveyViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
