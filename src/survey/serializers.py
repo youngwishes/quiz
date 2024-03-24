@@ -77,6 +77,12 @@ class QuizSerializer(serializers.ModelSerializer):
             "assignment"
         )
 
+    def to_representation(self, instance: Quiz) -> dict:
+        representation = super().to_representation(instance)
+        if representation.get("conditions").get("expiration_date") is None:
+            del representation["conditions"]["expiration_date"]
+        return representation
+
     @atomic
     def create(self, validated_data: dict) -> Quiz:
         questions = validated_data.pop("questions")
