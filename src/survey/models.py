@@ -11,6 +11,11 @@ class QuizLogicType(models.TextChoices):
     SEQUENTIAL = "Sequential"
 
 
+class QuestionType(models.TextChoices):
+    SINGLE = "Single"
+    FREE = "Free"
+
+
 class Quiz(models.Model):
     title = models.CharField("заголовок", max_length=256)
     execution_time = models.IntegerField()
@@ -29,13 +34,9 @@ class Quiz(models.Model):
 
 
 class Question(models.Model):
-    class Type(models.TextChoices):
-        SINGLE = "Single"
-        FREE = "Free"
-
     _id = models.IntegerField()
     text = models.TextField("текст")
-    type = models.CharField("тип вопроса", choices=Type.choices)
+    type = models.CharField("тип вопроса", choices=QuestionType.choices)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="questions", null=True)
 
 

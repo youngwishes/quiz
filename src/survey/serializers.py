@@ -7,7 +7,9 @@ from survey.models import (
     QuizLogicType,
     Answer,
     Assignment,
+    QuestionType,
 )
+from survey.validation import QuizValidationService
 from users.models import User
 
 
@@ -28,7 +30,7 @@ class ConditionSerializer(serializers.ModelSerializer):
 class LogicSerializer(serializers.Serializer):
     type = serializers.ChoiceField(choices=QuizLogicType.choices)
 
-    def to_representation(self, instance):
+    def to_representation(self, instance: str) -> str:
         return instance
 
 
@@ -51,6 +53,12 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ("id", "text", "type", "answers")
+
+    def to_representation(self, instance: Question) -> dict:
+        representation = super().to_representation(instance)
+        if representation.get("type") == QuestionType.FREE:
+            del representation["answers"]
+        return representation
 
 
 class QuizListSerializer(serializers.ModelSerializer):
@@ -94,7 +102,7 @@ class QuizSerializer(serializers.ModelSerializer):
         return instance
 
     @atomic
-    def update(self, instance, validated_data):
+    def update(self, instance: Quiz, validated_data: dict) -> Quiz:
         questions = validated_data.pop("questions")
         users = validated_data.pop("assignment")
         validated_data["type"] = validated_data.pop("type").get("type")
@@ -107,8 +115,9 @@ class QuizSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def create_assignment(users: list[dict], instance: Quiz) -> None:
-        for user in users:
-            user = get_object_or_404(User, pk=user.get("user").get("id"))
+        user_ids = set(assignment.get("user").get("id") for assignment in users)
+        for user_id in user_ids:
+            user = get_object_or_404(User, pk=user_id)
             Assignment.objects.create(
                 user=user,
                 quiz=instance,
@@ -116,8 +125,10 @@ class QuizSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def create_questions(data: list[dict], instance: Quiz) -> None:
+        service = QuizValidationService(data=data)
+        service.run_validation_checkers()
         for question in data:
-            if answers := question.pop("answers", None):
-                question_instance = Question.objects.create(**question, quiz=instance)
-                for answer in answers:
-                    Answer.objects.create(**answer, question=question_instance)
+            answers = question.pop("answers", [])
+            question_instance = Question.objects.create(**question, quiz=instance)
+            for answer in answers:
+                Answer.objects.create(**answer, question=question_instance)
