@@ -42,7 +42,7 @@ class Question(models.Model):
 
 class Answer(models.Model):
     text = models.TextField()
-    next_question_id = models.IntegerField()
+    next_question_id = models.IntegerField(null=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="answers", null=True)
 
 

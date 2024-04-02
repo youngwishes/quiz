@@ -34,8 +34,12 @@ class QuizValidationService(BaseValidationService):
 
     @property
     def next_question_ids(self) -> set[id]:
-        return {answer.get("next_question_id") for answer in self.answers}
+        return {
+            answer.get("next_question_id")
+            for answer in self.answers if isinstance(answer.get("next_question_id"), int)
+        }
 
     def check_next_question_id(self) -> None:
+
         if self.next_question_ids.difference(self.question_ids):
             raise ValidationError(detail={"detail": "No Question matches the given query."})
